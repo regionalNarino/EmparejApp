@@ -1,0 +1,22 @@
+package com.example.worldskills.emparejapp;
+
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+
+public class Conexion extends SQLiteOpenHelper {
+    public Conexion(Context context) {
+        super(context, "game", null, 1);
+    }
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        db.execSQL("create table configuracion (estado text,tiempo text)");
+        db.execSQL("insert into configuracion values('off')");
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+
+    }
+}

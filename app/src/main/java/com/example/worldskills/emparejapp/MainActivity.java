@@ -27,6 +27,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     TextView tvJugadorUno,tvJugadorDos,tvPuntajeUno,tvPuntajeDos;
 
     int turno;
+    int puntosUno=0;
+    int puntosDos=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +59,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         tvJugadorUno=findViewById(R.id.jugadorUno);
         tvJugadorDos=findViewById(R.id.jugadorDos);
+        tvPuntajeUno=findViewById(R.id.puntajeUno);
+        tvPuntajeDos=findViewById(R.id.puntajeDos);
+
         tvJugadorUno.setText(Usuario.jugadorUno);
         tvJugadorDos.setText(Usuario.jugadorDos);
 
@@ -91,7 +96,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (contador==2){
                     i++;
                     contador=0;
-
                 }
             }
         }
@@ -211,37 +215,68 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void comparar() {
         disabledButton(); //desabilitamos los botones para que el usuario no pueda hacer click mas de dos veces
 
-                if (seleccionado1==seleccionado2){
-                    //comparamos el nuevo id que contiene el boton con las variable que han guardado los id de las imagenes
-                    //si el id que tiene el boton actualmente es igual al de las imagenes estas se van a ocultar
-                    if (btn1.getId()==seleccionado1 && btn1.getId()==seleccionado2){btn1.setVisibility(View.INVISIBLE);}
-                    if (btn2.getId()==seleccionado1 && btn2.getId()==seleccionado2){btn2.setVisibility(View.INVISIBLE);}
-                    if (btn3.getId()==seleccionado1 && btn3.getId()==seleccionado2){btn3.setVisibility(View.INVISIBLE);}
-                    if (btn4.getId()==seleccionado1 && btn4.getId()==seleccionado2){btn4.setVisibility(View.INVISIBLE);}
-                    if (btn5.getId()==seleccionado1 && btn5.getId()==seleccionado2){btn5.setVisibility(View.INVISIBLE);}
-                    if (btn6.getId()==seleccionado1 && btn6.getId()==seleccionado2){btn6.setVisibility(View.INVISIBLE);}
-                    if (btn7.getId()==seleccionado1 && btn7.getId()==seleccionado2){btn7.setVisibility(View.INVISIBLE);}
-                    if (btn8.getId()==seleccionado1 && btn8.getId()==seleccionado2){btn8.setVisibility(View.INVISIBLE);}
-
+        if (seleccionado1==seleccionado2){
+            //comparamos el nuevo id que contiene el boton con las variable que han guardado los id de las imagenes
+            //si el id que tiene el boton actualmente es igual al de las imagenes estas se van a ocultar
+            if (btn1.getId()==seleccionado1 && btn1.getId()==seleccionado2){btn1.setVisibility(View.INVISIBLE);}
+            if (btn2.getId()==seleccionado1 && btn2.getId()==seleccionado2){btn2.setVisibility(View.INVISIBLE);}
+            if (btn3.getId()==seleccionado1 && btn3.getId()==seleccionado2){btn3.setVisibility(View.INVISIBLE);}
+            if (btn4.getId()==seleccionado1 && btn4.getId()==seleccionado2){btn4.setVisibility(View.INVISIBLE);}
+            if (btn5.getId()==seleccionado1 && btn5.getId()==seleccionado2){btn5.setVisibility(View.INVISIBLE);}
+            if (btn6.getId()==seleccionado1 && btn6.getId()==seleccionado2){btn6.setVisibility(View.INVISIBLE);}
+            if (btn7.getId()==seleccionado1 && btn7.getId()==seleccionado2){btn7.setVisibility(View.INVISIBLE);}
+            if (btn8.getId()==seleccionado1 && btn8.getId()==seleccionado2){btn8.setVisibility(View.INVISIBLE);}
+            aumentarPuntos();
+            enabledButton();
+        }else{
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
                     enabledButton();
-                }else{
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            enabledButton();
-                            ocultarImagen();
-                        }
-                    },1000);
+                    ocultarImagen();
                 }
+            },1000);
+            reducirPuntos();
+            cambiarTurno();
+            cambiarColores();
+        }
+        seleccionado1=0;
+        seleccionado2=0;
+        retornarId();
+    }
 
-                seleccionado1=0;
-                seleccionado2=0;
-                retornarId();
+    private void reducirPuntos() {
+        if (turno==0){
+            puntosUno-=2;
+        }else{
+            puntosDos-=2;
+        }
+        if (puntosUno<0){
+            puntosUno=0;
+        }
+        if (puntosDos<0){
+            puntosDos=0;
+        }
+        actualizarPuntos();
+    }
 
+    private void actualizarPuntos() {
+        tvPuntajeUno.setText(Integer.toString(puntosUno));
+        tvPuntajeDos.setText(Integer.toString(puntosDos));
+    }
 
+    private void cambiarTurno() {
+        if (turno==0) turno=1;
+        else turno=0;
+    }
 
-
-
+    private void aumentarPuntos() {
+        if (turno==0){
+            puntosUno+=100;
+        }else{
+            puntosDos+=100;
+        }
+        actualizarPuntos();
     }
 
     private void ocultarImagen() {
