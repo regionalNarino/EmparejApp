@@ -91,6 +91,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (contador==2){
                     i++;
                     contador=0;
+
                 }
             }
         }
