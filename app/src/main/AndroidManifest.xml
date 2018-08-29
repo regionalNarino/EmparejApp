@@ -19,9 +19,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ConfiguracionActivity"></activity>
+        <activity android:name=".ConfiguracionActivity" />
         <activity android:name=".SplashActivity" />
-        <activity android:name=".PuntajesActivity"></activity>
+        <activity android:name=".PuntajesActivity" />
+        <activity android:name=".ListadoPuntajesActivity"></activity>
     </application>
 
 </manifest>
