@@ -16,11 +16,19 @@ public class PuntajesActivity extends AppCompatActivity {
     }
 
     public void onClick(View view) {
-        Intent inten=new Intent(PuntajesActivity.this,ListadoPuntajesActivity.class);
+        Intent intent=new Intent(PuntajesActivity.this,ListadoPuntajesActivity.class);
         switch (view.getId()){
             case R.id.facil:
-
+                intent.putExtra("nivel","facil");
+                break;
+            case R.id.medio:
+                intent.putExtra("nivel","medio");
+                break;
+            case R.id.dificil:
+                intent.putExtra("nivel","dificil");
                 break;
         }
+
+        startActivity(intent);
     }
 }

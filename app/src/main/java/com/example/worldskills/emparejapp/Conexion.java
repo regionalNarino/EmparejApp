@@ -14,7 +14,10 @@ public class Conexion extends SQLiteOpenHelper {
         db.execSQL("create table configuracion (estado text,tiempo text)");
         db.execSQL("insert into configuracion (estado,tiempo) values('off','30000')");
 
-        db.execSQL("create table puntaje(id integer primary key autoincrement, nombre text, puntos text)");
+        db.execSQL("create table puntaje(id integer primary key autoincrement, nombre text, puntos text, dificultad text)");
+        db.execSQL("insert into puntaje(nombre,puntos,dificultad) values('julio','300','dificil')");
+        db.execSQL("insert into puntaje(nombre,puntos,dificultad) values('jorge','300','facil')");
+        db.execSQL("insert into puntaje(nombre,puntos,dificultad) values('luis','300','medio')");
     }
 
     @Override
