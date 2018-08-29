@@ -185,9 +185,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void comparar() {
         disabledButton(); //desabilitamos los botones para que el usuario no pueda hacer click mas de dos veces
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
+
                 if (seleccionado1==seleccionado2){
                     //comparamos el nuevo id que contiene el boton con las variable que han guardado los id de las imagenes
                     //si el id que tiene el boton actualmente es igual al de las imagenes estas se van a ocultar
@@ -200,23 +198,47 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     if (btn7.getId()==seleccionado1 && btn7.getId()==seleccionado2){btn7.setVisibility(View.INVISIBLE);}
                     if (btn8.getId()==seleccionado1 && btn8.getId()==seleccionado2){btn8.setVisibility(View.INVISIBLE);}
 
-                    seleccionado1=0;
-                    seleccionado2=0;
-                    retornarId();
+                    enabledButton();
                 }else{
-                    seleccionado1=0;
-                    seleccionado2=0;
-                    retornarId();
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            enabledButton();
+                            ocultarImagen();
+                        }
+                    },1000);
                 }
 
-                enabledButton();//volvemos a habilitar los botones pasados 2 segundos
+                seleccionado1=0;
+                seleccionado2=0;
+                retornarId();
 
-            }
-        },1000);
+
+
+
 
     }
 
+    private void ocultarImagen() {
+        btn1.setImageResource(R.drawable.quien);
+        btn2.setImageResource(R.drawable.quien);
+        btn3.setImageResource(R.drawable.quien);
+        btn4.setImageResource(R.drawable.quien);
+        btn5.setImageResource(R.drawable.quien);
+        btn6.setImageResource(R.drawable.quien);
+        btn7.setImageResource(R.drawable.quien);
+        btn8.setImageResource(R.drawable.quien);
+    }
+
     private void enabledButton() {
+        btn1.setEnabled(true);
+        btn2.setEnabled(true);
+        btn3.setEnabled(true);
+        btn4.setEnabled(true);
+        btn5.setEnabled(true);
+        btn6.setEnabled(true);
+        btn7.setEnabled(true);
+        btn8.setEnabled(true);
     }
 
     private void disabledButton() {
