@@ -12,7 +12,9 @@ public class Conexion extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("create table configuracion (estado text,tiempo text)");
-        db.execSQL("insert into configuracion values('off')");
+        db.execSQL("insert into configuracion (estado,tiempo) values('off','30000')");
+
+        db.execSQL("create table puntaje(id integer primary key autoincrement, nombre text, puntos text)");
     }
 
     @Override

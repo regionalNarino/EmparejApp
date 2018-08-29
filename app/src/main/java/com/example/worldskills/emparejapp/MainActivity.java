@@ -1,12 +1,21 @@
 package com.example.worldskills.emparejapp;
 
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
+import android.media.MediaPlayer;
+import android.os.CountDownTimer;
 import android.os.Handler;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,11 +33,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     int seleccionado1=0;
     int seleccionado2=0;
     int idDefault[];
-    TextView tvJugadorUno,tvJugadorDos,tvPuntajeUno,tvPuntajeDos;
+    TextView tvJugadorUno,tvJugadorDos,tvPuntajeUno,tvPuntajeDos,tiempo;
 
     int turno;
     int puntosUno=0;
     int puntosDos=0;
+
+    //definimos si el juego esta por defecto o con tiempo
+    boolean validarTiempo;
+    int tiempoTotal=0;
+    CountDownTimer timer; //Solo sirve en caso de que el usuario quiera jugar con tiempo
+
+    int contadorAciertos=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +77,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         tvJugadorDos=findViewById(R.id.jugadorDos);
         tvPuntajeUno=findViewById(R.id.puntajeUno);
         tvPuntajeDos=findViewById(R.id.puntajeDos);
+        tiempo=findViewById(R.id.tiempo);
 
         tvJugadorUno.setText(Usuario.jugadorUno);
         tvJugadorDos.setText(Usuario.jugadorDos);
@@ -68,6 +85,131 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //definimos quien sera el primero en iniciar el juego.
         turno= (int) (Math.random()*2);
         cambiarColores();  //ahora cambiamos los colores para mostrarle al usuario quien comienza el juego
+
+        validarTiempo=consultarModoJuego();
+        if (validarTiempo==true){
+            //entonces habilitamos el modo de juego con tiempo
+            timer=new CountDownTimer(tiempoTotal,1000) {
+                @Override
+                public void onTick(long millisUntilFinished) {
+                    tiempo.setText(Long.toString(millisUntilFinished/1000));
+                }
+
+                @Override
+                public void onFinish() {
+                    finalizarJuego();
+                }
+            }.start();
+        }else{
+            LinearLayout barra=findViewById(R.id.barraTiempo);
+            barra.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    private void finalizarJuego() {
+        guardarDatos();
+        desableAll();
+        AlertDialog.Builder ventana=new AlertDialog.Builder(MainActivity.this);
+        LayoutInflater layout=this.getLayoutInflater();
+        View view=layout.inflate(R.layout.ventana_fin_juego,null,false);
+
+        TextView numeroUno=view.findViewById(R.id.name0ne);
+        TextView numeroDos=view.findViewById(R.id.nameTwo);
+        TextView puntos1=view.findViewById(R.id.pointsOne);
+        TextView puntos2=view.findViewById(R.id.pointsTwo);
+        Button btnCompartir=view.findViewById(R.id.btnCompartir);
+
+        numeroUno.setText(tvJugadorUno.getText());
+        numeroDos.setText(tvJugadorDos.getText());
+        puntos1.setText(tvPuntajeUno.getText());
+        puntos2.setText(tvPuntajeDos.getText());
+
+        btnCompartir.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ventanaRedes();
+            }
+        });
+
+        ventana.setView(view);
+        ventana.create();
+        ventana.show();
+
+    }
+
+    private void guardarDatos() {
+        if (validarTiempo==false){
+            try{
+                String cadenaSQL="insert into puntaje (nombre,puntos) values('"+tvJugadorUno.getText()+"','"+tvPuntajeUno.getText()+"')";
+                String cadenaSQL2="insert into puntaje (nombre,puntos) values('"+tvJugadorDos.getText()+"','"+tvPuntajeDos.getText()+"')";
+                Conexion conexion=new Conexion(this);
+                SQLiteDatabase dn=conexion.getWritableDatabase();
+                dn.execSQL(cadenaSQL);
+                dn.execSQL(cadenaSQL2);
+
+            }catch (Exception e){
+                Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private void ventanaRedes() {
+
+        AlertDialog.Builder ventana=new AlertDialog.Builder(MainActivity.this);
+        ventana.setTitle("Donde quieres compartir este resultado");
+        final CharSequence [] opciones={"Facebook","Tweeter"};
+
+        ventana.setItems(opciones, new DialogInterface.OnClickListener() {
+            String texto="Acabo de jugar EmparejApp,           " +
+                    "Estos son los puntajes.      " +
+                    ""+tvJugadorUno.getText()+":  "+tvPuntajeUno.getText()+" " +
+                    ""+tvJugadorUno.getText()+":  "+tvPuntajeUno.getText()+"";
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (opciones[which].equals("Facebook")){
+                    Intent sendIntent = new Intent();
+                    sendIntent.setAction(Intent.ACTION_SEND);
+                    sendIntent.putExtra(Intent.EXTRA_TEXT, texto);
+                    sendIntent.setType("text/plain");
+                    sendIntent.setPackage("com.facebook.lite");
+                    startActivity(sendIntent);
+                }
+                if (opciones[which].equals("Tweeter")){
+                    Intent sendIntent = new Intent();
+                    sendIntent.setAction(Intent.ACTION_SEND);
+                    sendIntent.putExtra(Intent.EXTRA_TEXT, texto);
+                    sendIntent.setType("text/plain");
+                    sendIntent.setPackage("com.twitter.android");
+                    startActivity(sendIntent);
+                }
+
+            }
+        });
+        ventana.show();
+    }
+
+    private void desableAll() {
+        disabledButton();
+        if (validarTiempo==true){
+            timer.cancel();
+        }
+    }
+
+
+    private boolean consultarModoJuego() {
+        String cadenaSQL="select * from configuracion";
+        Conexion conexion=new Conexion(this);
+        SQLiteDatabase db=conexion.getReadableDatabase();
+        Cursor cursor=db.rawQuery(cadenaSQL,null);
+        cursor.moveToNext();
+        if (cursor.getString(0).equals("on")){
+            tiempoTotal=cursor.getInt(1);
+            return true;
+        }else{
+            return false;
+        }
+
     }
 
     private void cambiarColores() {
@@ -118,7 +260,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        Toast.makeText(this, "click", Toast.LENGTH_SHORT).show();
         switch (v.getId()){
             case R.id.btn1:
                 btn1.setImageResource(imagenesAleatorias[0]);  //carga la imagen
@@ -216,6 +357,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         disabledButton(); //desabilitamos los botones para que el usuario no pueda hacer click mas de dos veces
 
         if (seleccionado1==seleccionado2){
+            MediaPlayer media=MediaPlayer.create(this,R.raw.win);
+            media.start();
+
             //comparamos el nuevo id que contiene el boton con las variable que han guardado los id de las imagenes
             //si el id que tiene el boton actualmente es igual al de las imagenes estas se van a ocultar
             if (btn1.getId()==seleccionado1 && btn1.getId()==seleccionado2){btn1.setVisibility(View.INVISIBLE);}
@@ -226,6 +370,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if (btn6.getId()==seleccionado1 && btn6.getId()==seleccionado2){btn6.setVisibility(View.INVISIBLE);}
             if (btn7.getId()==seleccionado1 && btn7.getId()==seleccionado2){btn7.setVisibility(View.INVISIBLE);}
             if (btn8.getId()==seleccionado1 && btn8.getId()==seleccionado2){btn8.setVisibility(View.INVISIBLE);}
+            contadorAciertos++;
             aumentarPuntos();
             enabledButton();
         }else{
@@ -236,6 +381,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     ocultarImagen();
                 }
             },1000);
+            MediaPlayer media=MediaPlayer.create(this,R.raw.lose);
+            media.start();
             reducirPuntos();
             cambiarTurno();
             cambiarColores();
@@ -243,6 +390,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         seleccionado1=0;
         seleccionado2=0;
         retornarId();
+
+        if (contadorAciertos==4){
+            finalizarJuego();
+        }
+
     }
 
     private void reducirPuntos() {
