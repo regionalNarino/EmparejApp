@@ -1,11 +1,13 @@
 package com.example.worldskills.emparejapp;
 
+import android.graphics.Color;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -17,15 +19,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             R.drawable.nueve,R.drawable.diez,R.drawable.once,R.drawable.doce,R.drawable.trece,R.drawable.catorce,R.drawable.quince,R.drawable.dseis,
             R.drawable.dsiete,R.drawable.docho,R.drawable.dnueve,R.drawable.dveinte,
     };
-
     int imagenesAleatorias[]=new int[8];
     //construimos dos variables para comparar la igualdad de cada una
-
     int seleccionado1=0;
     int seleccionado2=0;
-
     int idDefault[];
+    TextView tvJugadorUno,tvJugadorDos,tvPuntajeUno,tvPuntajeDos;
 
+    int turno;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,10 +52,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btn8.setOnClickListener(this);
 
         idDefault= new int[]{R.id.btn1,R.id.btn2,R.id.btn3,R.id.btn4,R.id.btn5,R.id.btn6,R.id.btn7,R.id.btn8};
-
         imagenAleatoria();//seleccionar las imagenes que van a aparecer en el juego
         cargarImagenesArray();// seleccionar en que posicion van a ir las imagenes
+
+        tvJugadorUno=findViewById(R.id.jugadorUno);
+        tvJugadorDos=findViewById(R.id.jugadorDos);
+        tvJugadorUno.setText(Usuario.jugadorUno);
+        tvJugadorDos.setText(Usuario.jugadorDos);
+
+        //definimos quien sera el primero en iniciar el juego.
+        turno= (int) (Math.random()*2);
+        cambiarColores();  //ahora cambiamos los colores para mostrarle al usuario quien comienza el juego
     }
+
+    private void cambiarColores() {
+        if (turno==0){
+            tvJugadorUno.setTextColor(Color.GREEN);
+            tvPuntajeUno.setTextColor(Color.GREEN);
+            tvJugadorDos.setTextColor(Color.GRAY);
+            tvPuntajeDos.setTextColor(Color.GRAY);
+        }else{
+            tvJugadorUno.setTextColor(Color.GRAY);
+            tvPuntajeUno.setTextColor(Color.GRAY);
+            tvJugadorDos.setTextColor(Color.GREEN);
+            tvPuntajeDos.setTextColor(Color.GREEN);
+        }
+    }
+
 
     private void cargarImagenesArray() {
         int contador=0;
