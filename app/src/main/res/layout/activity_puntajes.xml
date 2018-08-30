@@ -24,6 +24,7 @@
         android:id="@+id/dificil"
         android:layout_height="wrap_content"
         android:onClick="onClick"
+
         android:text="Dificil"/>
 
 </LinearLayout>
